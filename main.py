@@ -53,8 +53,5 @@ with open(title, 'x') as post:
     print("Generating conclusion...")
     post.write("Conclusion:\n" + conclusionGen(title) + "\n\n")
 
-    # Dedication
-    post.write("❤ Thank you for reading! ❤\nThis post is dedicated to Hakini, ")
-
 
 print("printed to posts folder")

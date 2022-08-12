@@ -1,57 +1,70 @@
-from titleGen import titleGen
-from introGen import introGen
+from titleGen import titleGen, subtitleGen, titlePicker, dir
 from quoteGen import quoteGen
+from introGen import introGen
 from bodyOutlineGen import BOGen
 from bodyParagraphGen import BPGen
 from conclusionGen import conclusionGen
 import os
+from clear import clear
+from socialPoster.poster import socialPoster
 
+
+
+# Start Screen
 while True:
-    done = False
-    titleChoice = input("\n(C)ustom title, or (A)uto-title? ")
+    clear()
+    print("\nWelcome to albert.py")
+    menu = input("""
+    1) Generate 7 blog posts
 
-    if titleChoice.lower() == "c":
-        title = input("(B for back) Title: ")
-        break
-    while True:
-        if titleChoice.lower() == "a":
-            print("\n\nGenerating title...")
-            title = titleGen()
-            titleSelect = input("\n\"" + title + "\"\n\nY or N? (or B for back) ")
-            if titleSelect.lower() == "y":
-                done = True
-                break
-            elif titleSelect.lower() == "b":
-                break
-    if done:
-        break
+    2) Post a post to Reddit
 
-os.chdir("posts")
+        >>> """)
 
-with open(title, 'x') as post:
-    # Title
-    post.write("Title:\n" + title + "\n\n")
+    if menu == "1":
+        clear()
+        # Write to post file
+        weeklyTitles = titlePicker()
+        i = 1
+        for currentTitle in weeklyTitles:
+            subtitle = subtitleGen(currentTitle)
+            clear()
+            print(f"Generating post {i}/7 - {currentTitle}...\n")
 
-    # Credit to albert.py
-    post.write("The following was written by an AI\n\n")
+            os.chdir(dir)
+            with open(currentTitle + ".html", 'x') as post:
+                # Title
+                post.write("<h3>" + currentTitle + "</h3>\n<h4>" + subtitle + "</h4>")
 
-    # Quote
-    print("Generating quote...")
-    post.write("Quote:\n" + quoteGen(title) + "\n\n")
+                # Credit to albert.py
+                post.write("<p><i>The following was written by an AI</i></p>\n\n")
 
-    # Intro
-    print("Generating introduction...")
-    post.write("Introduction:\n" + introGen(title) + "\n\n")
+                # Quote
+                print("Generating quote...")
+                post.write("<br/>\n\n<blockquote class='graf graf--blockquote graf--startsWithDoubleQuote graf-after--p is-selected'>" + quoteGen(currentTitle, subtitle) + "</blockquote>\n\n<br/>\n\n")
 
-    # Body
-    print("Generating body...")
-    for part in BOGen(title).split("\n"):
-        if part:
-            post.write(part + "\n" + BPGen(title, part) + "\n\n")
+                # Intro
+                print("Generating introduction...")
+                post.write("<p>" + introGen(currentTitle, subtitle) + "</p>\n\n<hr/>\n\n")
 
-    # Conclusion
-    print("Generating conclusion...")
-    post.write("Conclusion:\n" + conclusionGen(title) + "\n\n")
+                # Body
+                print("Generating body...")
+                for part in BOGen(currentTitle, subtitle).split("\n"):
+                    if part:
+                        post.write("<h3>" + part + "</h3>\n\n<p>" + BPGen(currentTitle, subtitle, part) + "</p>\n\n")
+
+                # Conclusion
+                print("Generating conclusion...")
+                post.write("<hr/>\n\n<p>" + conclusionGen(currentTitle, subtitle) + "</p>\n\n")
+
+            i += 1
 
 
-print("printed to posts folder")
+    elif menu == "2":
+
+        # social poster (only Reddit rn)
+        socialPoster()
+
+
+clear()
+print("Done!")
